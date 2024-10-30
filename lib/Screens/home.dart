@@ -26,75 +26,83 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget buildTaskList(Controller controller, List<TodoModal> tasks) {
-    return ListView.builder(
-      itemCount: tasks.length,
-      itemBuilder: (context, index) {
-        return Dismissible(
-          key: Key(tasks[index].task),
-          background: Container(
-            color: Colors.red,
-            alignment: Alignment.centerRight,
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: const Icon(Icons.delete, color: Colors.white),
-          ),
-          direction: DismissDirection.endToStart,
-          onDismissed: (direction) {
-            if (direction == DismissDirection.startToEnd) {
-              controller.changeTaskStatus(index);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                    content: Text('${tasks[index].task} marked as completed')),
-              );
-            } else if (direction == DismissDirection.endToStart) {
-              controller.deleteTask(index);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${tasks[index].task} deleted')),
-              );
-            }
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Card(
-              child: ListTile(
-                leading: Checkbox(
-                  value: tasks[index].status,
-                  onChanged: (value) {
-                    controller.changeTaskStatus(tasks.indexOf(tasks[index]));
-                  },
+    return tasks.isEmpty
+        ? const Center(
+            child: Text('Please add Tasks'),
+          )
+        : ListView.builder(
+            itemCount: tasks.length,
+            itemBuilder: (context, index) {
+              return Dismissible(
+                key: Key(tasks[index].task),
+                background: Container(
+                  color: Colors.red,
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: const Icon(Icons.delete, color: Colors.white),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                title: Text(tasks[index].task),
-                subtitle: Text(
-                    tasks[index].status == false ? 'Pending' : 'Completed'),
-                trailing: PopupMenuButton(
-                  onSelected: (selectedValue) {
-                    if (selectedValue == 'edit') {
-                      controller.showTaskDialog(context,
-                          task: tasks[index].task, index: index);
-                    } else if (selectedValue == 'delete') {
-                      controller.confirmDialog(tasks.indexOf(tasks[index]));
-                    }
-                  },
-                  itemBuilder: (context) {
-                    return [
-                      const PopupMenuItem(
-                        value: 'edit',
-                        child: Text('Edit'),
+                direction: DismissDirection.endToStart,
+                onDismissed: (direction) {
+                  if (direction == DismissDirection.startToEnd) {
+                    controller.changeTaskStatus(index);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content:
+                              Text('${tasks[index].task} marked as completed')),
+                    );
+                  } else if (direction == DismissDirection.endToStart) {
+                    controller.deleteTask(index);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('${tasks[index].task} deleted')),
+                    );
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    child: ListTile(
+                      leading: Checkbox(
+                        value: tasks[index].status,
+                        onChanged: (value) {
+                          controller
+                              .changeTaskStatus(tasks.indexOf(tasks[index]));
+                        },
                       ),
-                      const PopupMenuItem(
-                        value: 'delete',
-                        child: Text('Delete'),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    ];
-                  },
+                      title: Text(tasks[index].task),
+                      subtitle: Text(tasks[index].status == false
+                          ? 'Pending'
+                          : 'Completed'),
+                      trailing: PopupMenuButton(
+                        onSelected: (selectedValue) {
+                          if (selectedValue == 'edit') {
+                            controller.showTaskDialog(context,
+                                task: tasks[index].task, index: index);
+                          } else if (selectedValue == 'delete') {
+                            controller
+                                .confirmDialog(tasks.indexOf(tasks[index]));
+                          }
+                        },
+                        itemBuilder: (context) {
+                          return [
+                            const PopupMenuItem(
+                              value: 'edit',
+                              child: Text('Edit'),
+                            ),
+                            const PopupMenuItem(
+                              value: 'delete',
+                              child: Text('Delete'),
+                            ),
+                          ];
+                        },
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
+              );
+            },
+          );
   }
 }
